@@ -1,6 +1,6 @@
->Цель домашнего задания:
+># Цель домашнего задания:
 
-Научиться обновлять ядро в ОС Linux.
+## Научиться обновлять ядро в ОС Linux.
 
 >Описание домашнего задания:
 
@@ -8,7 +8,6 @@
 2) Обновить ядро ОС на новейшую стабильную версию из mainline-репозитория.
 3) Оформить отчет в README-файле в GitHub-репозитории.
 
-___
 
 Перед работами проверим текущую версию ядра:
 
@@ -93,8 +92,76 @@ $ uname -a
 
 Linux host1 6.18.7-061807-generic #202601231045 SMP PREEMPT_DYNAMIC Fri Jan 23 11:25:00 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
 ```
-___
 
->Дополнительное задание:
 
-Собрать ядро самостоятельно из исходных кодов.
+># Дополнительное задание:
+
+## Собрать ядро самостоятельно из исходных кодов.
+
+
+Добавляем “deb-src” в строку Types: в /etc/apt/sources.list.d/ubuntu.sources файле:
+
+```console
+Types: deb deb-src
+URIs: http://archive.ubuntu.com/ubuntu
+Suites: noble noble-updates noble-backports
+Components: main universe restricted multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+```
+
+Устанавливаем необходимые пакеты:
+
+```console
+$ sudo apt update && \
+    sudo apt build-dep -y linux linux-image-unsigned-$(uname -r) && \
+    sudo apt install -y fakeroot llvm libncurses-dev dwarves
+```
+
+Получаем исходный код ядра:
+
+```console
+$ apt source linux-image-unsigned-$(uname -r)
+```
+
+Подготовка исходного кода ядра:
+
+```console
+$ cd linux-6.8.0
+$ chmod a+x debian/scripts/* && \
+    chmod a+x debian/scripts/misc/* && \
+    fakeroot debian/rules clean
+```
+
+Изменяем ABI номер (9999) в файле debian.master/changelog:
+
+```console
+linux (6.8.0-9999.96) noble; urgency=medium
+```
+
+Изменяем конфигурацию ядра:
+
+```console
+$ fakeroot debian/rules editconfigs
+```
+
+Компилируем ядро:
+
+```console
+$ fakeroot debian/rules clean && \
+    fakeroot debian/rules binary
+
+виртуалка зависла при компиляции, переделывать не стал
+```
+
+Установка ядра:
+
+```console
+$ sudo dpkg -i *.deb
+```
+
+Перезагрузка:
+
+```console
+$ uname -a
+
+
