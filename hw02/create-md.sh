@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 mdadm --zero-superblock --force /dev/vd{b,c,d,e,f}             # зануляем суперблоки
 mdadm --create --verbose /dev/md0 -l 10 -n 4 /dev/vd{b,c,d,e}  # создаем рейд
