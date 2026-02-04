@@ -9,4 +9,4 @@ rsync -avxHAX --progress / /mnt/
 for i in /proc/ /sys/ /dev/ /run/ /boot/; do mount --bind $i /mnt/$i; done
 chroot /mnt/ grub-mkconfig -o /boot/grub/grub.cfg
 chroot /mnt/ update-initramfs -u
-#reboot
+
