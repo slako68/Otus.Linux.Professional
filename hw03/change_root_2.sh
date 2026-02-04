@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# уменьшаем root
 lvremove -y /dev/ubuntu-vg/ubuntu-lv
 lvcreate -n ubuntu-vg/ubuntu-lv -L 8G -y /dev/ubuntu-vg
 mkfs.ext4 /dev/ubuntu-vg/ubuntu-lv
@@ -8,7 +8,7 @@ rsync -avxHAX --progress / /mnt/
 for i in /proc/ /sys/ /dev/ /run/ /boot/; do mount --bind $i /mnt/$i; done
 chroot /mnt/ grub-mkconfig -o /boot/grub/grub.cfg
 chroot /mnt/ update-initramfs -u
-
+# монтируем /var
 pvcreate /dev/vdc /dev/vdd
 vgcreate vg_var /dev/vdc /dev/vdd
 lvcreate -L 950M -m1 -n lv_var vg_var

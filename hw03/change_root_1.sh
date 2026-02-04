@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# временный lv
 pvcreate /dev/vdb
 vgcreate vg_root /dev/vdb
 lvcreate -n lv_root -l +100%FREE -y /dev/vg_root
