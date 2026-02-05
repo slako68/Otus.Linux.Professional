@@ -56,6 +56,8 @@ Vagrant.configure("2") do |config|
 end
 ```
 
+## Определение алгоритма с наилучшим сжатием
+
 Устанавливаем ZFS:
 
 ```console
@@ -71,3 +73,45 @@ $ sudo zpool create otus3 mirror /dev/vdf /dev/vdg
 $ sudo zpool create otus4 mirror /dev/vdh /dev/vdi
 ```
 
+```console
+$ sudo zpool list
+
+NAME    SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP    HEALTH  ALTROOT
+otus1   480M   110K   480M        -         -     0%     0%  1.00x    ONLINE  -
+otus2   480M   110K   480M        -         -     0%     0%  1.00x    ONLINE  -
+otus3   480M   110K   480M        -         -     0%     0%  1.00x    ONLINE  -
+otus4   480M   132K   480M        -         -     0%     0%  1.00x    ONLINE  -
+```
+Добавим разные алгоритмы сжатия в каждую файловую систему:
+
+```console
+$ sudo zfs set compression=lzjb otus1
+$ sudo zfs set compression=lz4 otus2
+$ sudo zfs set compression=gzip-9 otus3
+$ sudo zfs set compression=zle otus4
+
+$ sudo zfs get all | grep compression
+
+otus1  compression           lzjb                   local
+otus2  compression           lz4                    local
+otus3  compression           gzip-9                 local
+otus4  compression           zle                    local
+```
+
+Алгоритм gzip-9 самый эффективный:
+```console
+$ zfs list
+
+NAME    USED  AVAIL  REFER  MOUNTPOINT
+otus1  21.7M   330M  21.6M  /otus1
+otus2  17.7M   334M  17.6M  /otus2
+otus3  10.9M   341M  10.7M  /otus3
+otus4  39.5M   313M  39.4M  /otus4
+
+$ zfs get all | grep compressratio | grep -v ref
+
+otus1  compressratio         1.82x                  -
+otus2  compressratio         2.23x                  -
+otus3  compressratio         3.66x                  -
+otus4  compressratio         1.00x                  -
+```
