@@ -100,7 +100,7 @@ otus4  compression           zle                    local
 
 Алгоритм gzip-9 самый эффективный:
 ```console
-$ zfs list
+$ sudo zfs list
 
 NAME    USED  AVAIL  REFER  MOUNTPOINT
 otus1  21.7M   330M  21.6M  /otus1
@@ -108,10 +108,13 @@ otus2  17.7M   334M  17.6M  /otus2
 otus3  10.9M   341M  10.7M  /otus3
 otus4  39.5M   313M  39.4M  /otus4
 
-$ zfs get all | grep compressratio | grep -v ref
+$ sudo zfs get all | grep compressratio | grep -v ref
 
 otus1  compressratio         1.82x                  -
 otus2  compressratio         2.23x                  -
 otus3  compressratio         3.66x                  -
 otus4  compressratio         1.00x                  -
 ```
+
+## Определение настроек пула
+
