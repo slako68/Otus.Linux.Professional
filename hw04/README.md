@@ -25,6 +25,8 @@
 Развертываем окружение (Vagrantfile):
 
 ```console
+$ vagrant up
+
 ENV['VAGRANT_SERVER_URL'] = 'https://vagrant.elab.pro'
 Vagrant.configure("2") do |config|
   N = 1
@@ -118,3 +120,83 @@ otus4  compressratio         1.00x                  -
 
 ## Определение настроек пула
 
+Импорт пула:
+
+```console
+$ sudo zpool import -d zpoolexport/ otus
+$ zpool status
+
+  pool: otus
+ state: ONLINE
+status: Some supported and requested features are not enabled on the pool.
+	The pool can still be used, but some features are unavailable.
+action: Enable all features using 'zpool upgrade'. Once this is done,
+	the pool may no longer be accessible by software that does not support
+	the features. See zpool-features(7) for details.
+config:
+
+	NAME                                 STATE     READ WRITE CKSUM
+	otus                                 ONLINE       0     0     0
+	  mirror-0                           ONLINE       0     0     0
+	    /home/vagrant/zpoolexport/filea  ONLINE       0     0     0
+	    /home/vagrant/zpoolexport/fileb  ONLINE       0     0     0
+
+errors: No known data errors
+
+$ zfs get all otus
+
+NAME  PROPERTY              VALUE                  SOURCE
+otus  type                  filesystem             -
+otus  creation              Fri May 15  4:00 2020  -
+otus  used                  2.04M                  -
+otus  available             350M                   -
+otus  referenced            24K                    -
+otus  compressratio         1.00x                  -
+otus  mounted               yes                    -
+otus  quota                 none                   default
+. . . 
+
+$ zfs get available otus
+
+NAME  PROPERTY   VALUE  SOURCE
+otus  available  350M   -
+
+$ zfs get readonly otus
+
+NAME  PROPERTY  VALUE   SOURCE
+otus  readonly  off     default
+
+$ zfs get recordsize otus
+
+NAME  PROPERTY    VALUE    SOURCE
+otus  recordsize  128K     local
+
+$ zfs get compression otus
+
+NAME  PROPERTY     VALUE           SOURCE
+otus  compression  zle             local
+
+$ zfs get checksum otus
+
+NAME  PROPERTY  VALUE      SOURCE
+otus  checksum  sha256     local
+```
+
+## Работа со снапшотом, поиск сообщения от преподавателя
+
+Восстановим файловую систему из снапшота:
+
+```console
+$ sudo zfs receive otus/test@today < otus_task2.file
+```
+
+Смотрим содержимое найденного файла:
+
+```console
+$ find /otus/test -name "secret_message"
+
+$ cat /otus/test/task1/file_mess/secret_message
+
+https://otus.ru/lessons/linux-hl/
+
+```
