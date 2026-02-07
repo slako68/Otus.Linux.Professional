@@ -1,0 +1,44 @@
+ENV['VAGRANT_SERVER_URL'] = 'https://vagrant.elab.pro'
+
+Vagrant.configure("2") do |config|
+
+  IP1 = "192.168.122.101"
+  IP2 = "192.168.122.102"
+
+  config.vm.define "nfss" do |node|
+    node.vm.box = "bento/ubuntu-24.04"
+    node.vm.hostname = "nfss"
+    node.vm.network "private_network", ip: "#{IP1}"
+    node.vm.provider :libvirt do |libvirt|
+      libvirt.cpus = "1"
+      libvirt.memory = "1024"
+    end
+    node.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt install nfs-kernel-server -y
+    mkdir -p /srv/share/upload
+    chown -R nobody:nogroup /srv/share
+    chmod 0777 /srv/share/upload
+    echo "/srv/share #{IP2}/32(rw,sync,root_squash)" > /etc/exports 
+    reboot
+    SHELL
+  end
+
+    config.vm.define "nfsc" do |node|
+    node.vm.box = "bento/ubuntu-24.04"
+    node.vm.hostname = "nfsc"
+    node.vm.network "private_network", ip: "#{IP2}"
+    node.vm.provider :libvirt do |libvirt|
+      libvirt.cpus = "1"
+      libvirt.memory = "1024"
+    end
+    node.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt install nfs-common -y
+    echo "#{IP1}:/srv/share/ /mnt nfs vers=3,noauto,x-systemd.automount 0 0" >> /etc/fstab
+    reboot
+    SHELL
+  end
+
+end
+
