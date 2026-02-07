@@ -34,7 +34,7 @@ Vagrant.configure("2") do |config|
 end
 ```
 
-## Создать свой RPM пакет
+## Создаем свой RPM пакет
 
 Устанавливаем пакеты:
 
@@ -118,7 +118,7 @@ cmake --build . --config Release -j 2 --target brotlienc
              └─14935 "nginx: worker process"
 ```
 
-## Создать свой репозиторий
+## Создаем свой репозиторий
 
 ```console
 # mkdir /usr/share/nginx/html/repo
