@@ -1,0 +1,18 @@
+ENV['VAGRANT_SERVER_URL'] = 'https://vagrant.elab.pro'
+
+Vagrant.configure("2") do |config|
+  N = 1
+  (1..N).each do |i|  
+    config.vm.define "host#{i}" do |node|
+      node.vm.box = "cloud-image/fedora-42"
+      node.vm.hostname = "host#{i}"
+      node.vm.network "private_network", ip: "192.168.122.10#{i}"
+      node.vm.synced_folder ".", "/vagrant"
+      node.vm.provider :libvirt do |libvirt|
+        libvirt.cpus = "1"
+        libvirt.memory = "1024"
+      end
+    end
+  end
+end
+

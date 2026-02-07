@@ -5,4 +5,5 @@
 * [#03. Работа с LVM-RAID.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw03)
 * [#04. ZFS.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw04)
 * [#05. Работа с NFS.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw05)
+* [#06. Размещаем свой RPM в своем репозитории.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw06)
 
