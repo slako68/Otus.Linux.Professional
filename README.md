@@ -7,4 +7,5 @@
 * [#05. Работа с NFS.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw05)
 * [#06. Размещаем свой RPM в своем репозитории.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw06)
 * [#07. Загрузка системы.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw07)
+* [#08. Инициализация системы. Systemd .](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw08)
 
