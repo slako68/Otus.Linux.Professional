@@ -1,0 +1,19 @@
+ENV['VAGRANT_SERVER_URL'] = 'https://vagrant.elab.pro'
+
+Vagrant.configure("2") do |config|
+  N = 1
+  (1..N).each do |i|  
+    config.vm.define "host#{i}" do |node|
+      node.vm.box = "bento/ubuntu-24.04"
+      node.vm.hostname = "host#{i}"
+      node.vm.network "private_network", ip: "192.168.122.10#{i}"
+      node.vm.provider :libvirt do |libvirt|
+        libvirt.cpus = "1"
+        libvirt.memory = "1024"
+      end
+      node.vm.provision "shell", inline: <<-SHELL
+      apt-get update
+      SHELL
+    end
+  end
+end
