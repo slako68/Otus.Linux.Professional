@@ -10,3 +10,4 @@
 * [#08. Инициализация системы. Systemd.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw08)
 * [#09. Bash.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw09)
 * [#10. Управление процессами.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw10)
+* [#11. SELinux - когда все запрещено.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw11)
