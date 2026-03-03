@@ -1,0 +1,46 @@
+# -*- mode: ruby -*-
+# vim: set ft=ruby :
+
+MACHINES = {
+  :nginx => {
+        :box_name => "bento/ubuntu-24.04",
+        :vm_name => "nginx",
+        :net => [
+           ["192.168.122.150",  2, "255.255.255.0", "mynet"],
+        ]
+  }
+}
+
+Vagrant.configure("2") do |config|
+
+  MACHINES.each do |boxname, boxconfig|
+
+    config.vm.define boxname do |box|
+   
+      box.vm.box = boxconfig[:box_name]
+      box.vm.host_name = boxconfig[:vm_name]
+      
+      box.vm.provider :libvirt do |libvirt|
+        libvirt.cpus = 2
+        libvirt.memory = 2048
+        libvirt.forward_ssh_port = true
+      end
+
+      boxconfig[:net].each do |ipconf|
+        box.vm.network("private_network", ip: ipconf[0])
+      end
+
+      if boxconfig.key?(:public)
+        box.vm.network "public_network", boxconfig[:public]
+      end
+
+      box.vm.provision "shell", inline: <<-SHELL
+        apt update
+        DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install openssh-server -y
+      SHELL
+      box.vm.provision "ansible" do |ansible|
+        ansible.playbook = "nginx.yml"
+      end
+    end
+  end
+end
