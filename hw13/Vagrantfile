@@ -1,0 +1,31 @@
+ENV['VAGRANT_SERVER_URL'] = 'https://vagrant.elab.pro'
+
+Vagrant.configure("2") do |config|
+  N = 1
+  (1..N).each do |i|  
+    config.vm.define "host#{i}" do |node|
+      node.vm.box = "bento/ubuntu-24.04"
+      node.vm.hostname = "host#{i}"
+      node.vm.network "private_network", ip: "192.168.122.10#{i}"
+      node.vm.network "forwarded_port", guest: 80, host: "8080"
+      node.vm.synced_folder ".", "/vagrant"
+      node.vm.provider :libvirt do |libvirt|
+        libvirt.cpus = "2"
+        libvirt.memory = "1024"
+          M = 2
+          (1..M).each do |j|
+            libvirt.storage :file, :size => '1024M'
+          end
+      end
+      node.vm.provision "shell", inline: <<-SHELL
+      mkdir -p /mnt/disk{1,2}
+      for i in {b,c}; do mkfs.ext4 -F /dev/vd$i; done
+      mount /dev/vdb /mnt/disk1
+      mount /dev/vdc /mnt/disk2
+      echo "`blkid | grep /dev/vdb: | awk '{print $2}'` /mnt/disk1 ext4 defaults 0 0" >> /etc/fstab
+      echo "`blkid | grep /dev/vdc: | awk '{print $2}'` /mnt/disk2 ext4 defaults 0 0" >> /etc/fstab
+      SHELL
+    end
+  end
+end
+
