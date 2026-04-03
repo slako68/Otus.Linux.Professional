@@ -14,3 +14,4 @@
 * [#12. Автоматизация администрирования. Ansible-1.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw12)
 * [#13. Vagrant.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw13)
 * [#14. Docker: основы работы с контейнеризацией.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw14)
+* [#15. Prometheus.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw15)
