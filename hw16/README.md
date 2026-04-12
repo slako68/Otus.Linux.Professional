@@ -77,6 +77,14 @@ end
   ansible.builtin.service:
     name: sshd.service
     state: restarted
+
+- name: Copy /etc/polkit-1/rules.d/01-dockerrestart.rules
+  ansible.builtin.copy:
+    src: ../files/01-dockerrestart.rules
+    dest: /etc/polkit-1/rules.d/01-dockerrestart.rules
+    owner: root
+    group: root
+    mode: '0644'
 ```
 
 ## Вход otusadm и не вход otus: 
