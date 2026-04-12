@@ -1,0 +1,51 @@
+---
+- name: Install nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  when: ansible_hostname == 'web1'
+
+- name: Install rsyslog
+  ansible.builtin.apt:
+    name: rsyslog
+    state: present
+    update_cache: yes
+
+- name: Copy /etc/rsyslog.conf
+  ansible.builtin.copy:
+    src: ../files/rsyslog_server.conf
+    dest: /etc/rsyslog.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: ansible_hostname == 'log1'
+
+- name: Copy /etc/rsyslog.conf
+  ansible.builtin.copy:
+    src: ../files/rsyslog_client.conf
+    dest: /etc/rsyslog.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: ansible_hostname == 'web1'
+
+- name: Restart rsyslog
+  ansible.builtin.service:
+    name: rsyslog.service
+    state: restarted
+
+- name: Copy  /etc/nginx/nginx.conf
+  ansible.builtin.copy:
+    src: ../files/nginx.conf
+    dest:  /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: ansible_hostname == 'web1'
+
+- name: Restart nginx
+  ansible.builtin.service:
+    name: nginx.service
+    state: restarted
+  when: ansible_hostname == 'web1'

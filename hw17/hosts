@@ -1,0 +1,5 @@
+[web]
+web1  ansible_host=192.168.122.101 vm_name=web1 ansible_ssh_private_key_file=.vagrant/machines/web1/libvirt/private_key ansible_user=vagrant
+
+[log]
+log1  ansible_host=192.168.122.201 vm_name=log1 ansible_ssh_private_key_file=.vagrant/machines/log1/libvirt/private_key ansible_user=vagrant
