@@ -98,3 +98,41 @@ Apr 12 07:47:10 host1 sshd-session[34203]: pam_exec(sshd:auth): /usr/local/bin/l
 Apr 12 07:47:12 host1 sshd-session[34203]: Failed password for otus from 192.168.122.1 port 45706 ssh2
 Apr 12 07:49:09 host1 sshd[34126]: Timeout before authentication for connection from 192.168.122.1 to 192.168.122.101, pid = 34203
 ```
+
+## Доступ к docker
+
+```bash
+$ sudo usermod -aG docker otus
+$ sudo -u otus -i
+$ docker --version
+Docker version 29.1.3, build 29.1.3-0ubuntu4
+$ docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+$
+```
+
+## Право перезапускать docker сервис /etc/polkit-1/rules.d/01-dockerrestart.rules
+
+```bash
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.systemd1.manage-units" &&
+        action.lookup("unit") == "docker.service" &&
+        action.lookup("verb") == "restart" &&
+        subject.user == "otus") {
+        return polkit.Result.YES;
+    }
+});
+
+$ sudo -u otus -i
+$ systemctl restart docker
+
+$ systemctl restart sshd
+==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ====
+Authentication is required to restart 'ssh.service'.
+Multiple identities can be used for authentication:
+ 1.  Ubuntu (ubuntu)
+ 2.  vagrant
+ 3.  otusadm
+Choose identity to authenticate as (1-3): ^C
+$
+```
