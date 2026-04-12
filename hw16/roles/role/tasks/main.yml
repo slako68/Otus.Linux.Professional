@@ -1,0 +1,42 @@
+---
+
+- name: Add group admin
+  ansible.builtin.group:
+    name: admin
+    state: present
+    
+- name: Add users
+  vars:
+    new_password: "{{ pass }}"
+    users:
+      - { name: 'vagrant', password: '{{ new_password | password_hash("sha512") }}', groups: 'admin' }
+      - { name: 'root', password: '{{ new_password | password_hash("sha512") }}', groups: 'admin' }
+      - { name: 'otusadm', password: '{{ new_password | password_hash("sha512") }}', groups: 'admin' }
+      - { name: 'otus', password: '{{ new_password | password_hash("sha512") }}', groups: '' }
+  user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    groups: "{{ item.groups }}"
+    append: yes
+  loop: "{{ users }}"
+
+- name: Copy /etc/pam.d/sshd
+  ansible.builtin.copy:
+    src: ../files/sshd
+    dest: /etc/pam.d/sshd
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy /usr/local/bin/login.sh
+  ansible.builtin.copy:
+    src: ../files/login.sh
+    dest: /usr/local/bin/login.sh
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Restart sshd
+  ansible.builtin.service:
+    name: sshd.service
+    state: restarted

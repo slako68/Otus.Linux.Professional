@@ -1,0 +1,2 @@
+[hosts]
+host1  ansible_host=192.168.122.101 vm_name=host1 ansible_ssh_private_key_file=.vagrant/machines/host1/libvirt/private_key ansible_user=vagrant

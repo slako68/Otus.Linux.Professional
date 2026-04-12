@@ -1,0 +1,9 @@
+---
+- name: role
+  hosts: hosts
+  gather_facts: true
+  become: true
+  roles:
+    - role
+
+...

@@ -15,3 +15,4 @@
 * [#13. Vagrant.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw13)
 * [#14. Docker: основы работы с контейнеризацией.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw14)
 * [#15. Prometheus.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw15)
+* [#16. Пользователи и группы. Авторизация и аутентификация.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw16)
