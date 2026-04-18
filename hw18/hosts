@@ -1,0 +1,5 @@
+[client]
+client1  ansible_host=192.168.122.101 vm_name=client1 ansible_ssh_private_key_file=.vagrant/machines/client1/libvirt/private_key ansible_user=vagrant
+
+[backup_server]
+server1  ansible_host=192.168.122.201 vm_name=server1 ansible_ssh_private_key_file=.vagrant/machines/server1/libvirt/private_key ansible_user=vagrant

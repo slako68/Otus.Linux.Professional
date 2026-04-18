@@ -1,0 +1,38 @@
+Vagrant.configure("2") do |config|
+  N = 1
+  (1..N).each do |i|  
+    config.vm.define "client#{i}" do |node|
+      node.vm.box = "bento/ubuntu-24.04"
+      node.vm.hostname = "client#{i}"
+      node.vm.network "private_network", ip: "192.168.122.10#{i}"
+      node.vm.network "forwarded_port", guest: 80, host: "8080"
+      node.vm.synced_folder ".", "/vagrant"
+      node.vm.provider :libvirt do |libvirt|
+        libvirt.cpus = "2"
+        libvirt.memory = "2048"
+      end
+    end
+    config.vm.define "server#{i}" do |node|
+      node.vm.box = "bento/ubuntu-24.04"
+      node.vm.hostname = "server#{i}"
+      node.vm.network "private_network", ip: "192.168.122.20#{i}"
+      node.vm.network "forwarded_port", guest: 80, host: "8080"
+      node.vm.synced_folder ".", "/vagrant"
+      node.vm.provider :libvirt do |libvirt|
+        libvirt.cpus = "2"
+        libvirt.memory = "2048"
+        M = 1
+        (1..M).each do |j|
+          libvirt.storage :file, :size => '2G'
+        end
+      end
+      if i == N
+        config.vm.provision "ansible" do |ansible|
+          ansible.playbook = "provision.yml"
+          ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
+        end    
+      end
+    end
+  end
+end
+

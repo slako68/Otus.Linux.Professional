@@ -1,0 +1,113 @@
+---
+- name: Install borgbackup
+  ansible.builtin.apt:
+    name: borgbackup
+    state: present
+    update_cache: yes
+
+- name: Format the volume with ext4 fs
+  community.general.filesystem:
+    fstype: ext4
+    dev: /dev/vdb
+  when: ansible_hostname == 'server1'
+
+- name: Create /var/backup
+  ansible.builtin.file:
+    path: /var/backup
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0755'
+  when: ansible_hostname == 'server1'
+
+- name: Mount ext4
+  mount:
+    path: /var/backup
+    src: /dev/vdb
+    fstype: ext4
+    state: mounted
+  when: ansible_hostname == 'server1'
+
+- name: Recursively change ownership of a directory
+  ansible.builtin.file:
+    path: /var/backup
+    state: directory
+    recurse: yes
+    owner: vagrant
+    group: vagrant
+  when: ansible_hostname == 'server1'
+
+- name: Recursively remove directory lost+found
+  ansible.builtin.file:
+    path: /var/backup/lost+found/
+    state: absent
+
+- name: Create /root/.ssh
+  become: true
+  ansible.builtin.file:
+    path: /root/.ssh
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  when: ansible_hostname == 'client1'
+
+- name: Copy .vagrant/machines/server1/libvirt/private_key
+  become: true
+  ansible.builtin.copy:
+    src: .vagrant/machines/server1/libvirt/private_key
+    dest: /root/.ssh/id_rsa
+    owner: root
+    group: root
+    mode: '0600'
+  when: ansible_hostname == 'client1'
+
+- name: Copy config
+  become: true
+  ansible.builtin.copy:
+    src: config
+    dest: /root/.ssh/config
+    owner: root
+    group: root
+    mode: '0600'
+  when: ansible_hostname == 'client1'
+
+- name: Create /etc/borg
+  ansible.builtin.file:
+    path: /etc/borg
+    state: directory
+  when: ansible_hostname == 'client1'
+
+- name: Create /etc/borg/borg.env
+  ansible.builtin.shell: |
+    cat > /etc/borg/borg.env <<'EOF'
+    BORG_PASSPHRASE={{ pass }}
+    EOF
+  when: ansible_hostname == 'client1'
+
+- name: Copy borg-backup.service
+  ansible.builtin.copy:
+    src: borg-backup.service
+    dest: /etc/systemd/system/borg-backup.service
+  when: ansible_hostname == 'client1'
+
+- name: Copy borg-backup.timer
+  ansible.builtin.copy:
+    src: borg-backup.timer
+    dest: /etc/systemd/system/borg-backup.timer
+  when: ansible_hostname == 'client1'
+
+- name: Make sure a service borg-backup.timer is running
+  ansible.builtin.systemd_service:
+    state: started
+    name: borg-backup.timer
+    enabled: true
+    daemon_reload: true
+  when: ansible_hostname == 'client1'
+
+- name: Start borg-backup.service
+  ansible.builtin.systemd_service:
+    state: started
+    name: borg-backup.service
+  when: ansible_hostname == 'client1'
+
