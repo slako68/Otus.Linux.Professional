@@ -17,3 +17,4 @@
 * [#15. Prometheus.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw15)
 * [#16. Пользователи и группы. Авторизация и аутентификация.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw16)
 * [#17. Основы сбора и хранения логов.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw17)
+* [#18. Резервное копирование.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw18)
