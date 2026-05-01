@@ -18,3 +18,4 @@
 * [#16. Пользователи и группы. Авторизация и аутентификация.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw16)
 * [#17. Основы сбора и хранения логов.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw17)
 * [#18. Резервное копирование.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw18)
+* [#19. Архитектура сетей .](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw19)
