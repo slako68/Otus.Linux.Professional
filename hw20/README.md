@@ -151,4 +151,4 @@ end
 
 ## Загрузка ВМ
 
-<video controls src="Запись экрана от 2026-05-09 11-58-00.mp4" title="Title"></video>
+![alt text](image.png)
