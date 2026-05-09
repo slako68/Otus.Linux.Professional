@@ -1,0 +1,90 @@
+---
+- name: network config
+  hosts: all
+  become: true
+
+# 1. Настройка DHCP и TFTP-сервера
+
+  tasks:
+    - name: install dnsmasq
+      ansible.builtin.apt:
+        name: dnsmasq
+        state: present
+        update_cache: yes
+
+    - name: disable ufw
+      ansible.builtin.systemd_service:
+        name: ufw
+        state: stopped
+        enabled: false
+
+    - name: Set up dnsmasq
+      template: 
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: "{{ item.mode }}"
+      with_items:
+        - { src: "templates/pxe.conf", dest: "/etc/dnsmasq.d/pxe.conf", mode: "0644" }
+
+    - name: mkdir -p /srv/tftp
+      ansible.builtin.command: mkdir -p /srv/tftp
+
+    - name: download files
+      get_url:
+        url: http://cdimage.ubuntu.com/ubuntu-server/noble/daily-live/current/noble-netboot-amd64.tar.gz
+        dest: /tmp/noble-netboot-amd64.tar.gz
+    
+    - name: Extract the archive file
+      ansible.builtin.unarchive:
+        src: /tmp/noble-netboot-amd64.tar.gz
+        dest: /srv/tftp
+        remote_src: yes
+        mode: "0755"
+
+# 2. Настройка Web-сервера
+
+    - name: install apache2
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+
+    - name: mkdir -p /srv/images
+      ansible.builtin.command: mkdir -p /srv/images
+
+    - name: mkdir -p /srv/ks
+      ansible.builtin.command: mkdir -p /srv/ks
+
+    - name: touch /srv/ks/meta-data
+      ansible.builtin.command: touch /srv/ks/meta-data
+
+    - name: download files
+      get_url:
+        url: http://cdimage.ubuntu.com/ubuntu-server/noble/daily-live/current/noble-live-server-amd64.iso
+        dest: /srv/images/noble-live-server-amd64.iso
+
+    - name: Set up dnsmasq
+      template: 
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: "{{ item.mode }}"
+      with_items:
+        - { src: "templates/ks-server.conf", dest: "/etc/apache2/sites-available/ks-server.conf", mode: "0644" }
+        - { src: "templates/default", dest: "/srv/tftp/amd64/pxelinux.cfg/default", mode: "0644" }
+        - { src: "templates/user-data", dest: "/srv/ks/user-data", mode: "0644" }
+
+    - name: Enable new site
+      command: a2ensite ks-server.conf
+ 
+    - name: Restart apache2
+      ansible.builtin.systemd_service:
+        name: apache2
+        state: restarted
+
+    - name: Restart dnsmasq
+      ansible.builtin.systemd_service:
+        name: dnsmasq
+        state: restarted
