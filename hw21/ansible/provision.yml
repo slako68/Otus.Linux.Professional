@@ -1,0 +1,80 @@
+---
+- name: network config
+  hosts: all
+  become: true
+
+  tasks:
+    - name: install traceroute
+      ansible.builtin.apt:
+        name: traceroute
+        state: present
+        update_cache: yes
+
+    - name: install nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+      when: (ansible_facts["hostname"] == "centralServer")
+
+    - name: disable ufw
+      ansible.builtin.systemd_service:
+        name: ufw
+        state: stopped
+        enabled: false
+      when: (ansible_hostname == "inetRouter" or ansible_hostname == "inetRouter2")
+
+    - name: Install iptables-persistent
+      ansible.builtin.shell: |
+        debconf-set-selections << "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+        debconf-set-selections << "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+      when: (ansible_hostname == "inetRouter" or ansible_hostname == "inetRouter2")
+
+    - name: install iptables-persistent
+      ansible.builtin.apt:
+        name: iptables-persistent
+        state: present
+      when: (ansible_hostname == "inetRouter" or ansible_hostname == "inetRouter2")
+
+    - name: Create /etc/iptables
+      ansible.builtin.command: mkdir -p /etc/iptables
+      when: (ansible_hostname == "inetRouter" or ansible_hostname == "inetRouter2")
+
+    - name: Set up NAT on inetRouter
+      template: 
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: "{{ item.mode }}"
+      with_items:
+        - { src: "templates/iptables_rules_{{ansible_hostname}}.ipv4", dest: "/etc/iptables/rules.v4", mode: "0644" }
+      when: (ansible_hostname == "inetRouter" or ansible_hostname == "inetRouter2")
+
+    - name: set up forward packages across routers
+      sysctl:
+        name: net.ipv4.conf.all.forwarding
+        value: '1'
+        state: present
+      when: "'routers' in group_names"
+
+    - name: disable default route
+      template: 
+        src: templates/00-installer-config.yaml
+        dest: /etc/netplan/00-installer-config.yaml
+        owner: root
+        group: root
+        mode: 0644
+      when: (ansible_hostname != "inetRouter") 
+
+    - name: add default gateway for centralRouter
+      template: 
+        src: templates/50-vagrant_{{ansible_hostname}}.yaml
+        dest: /etc/netplan/50-vagrant.yaml
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: restart all hosts
+      reboot:
+        reboot_timeout: 600
+

@@ -20,3 +20,5 @@
 * [#18. Резервное копирование.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw18)
 * [#19. Архитектура сетей.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw19)
 * [#20. DHCP, PXE.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw20)
+* [#21. Фильтрация трафика - iptables.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw21)
+* [#22. Статическая и динамическая маршрутизация, OSPF.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw22)
