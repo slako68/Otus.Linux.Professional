@@ -12,9 +12,17 @@
 
     - name: install nginx
       ansible.builtin.apt:
-        name: nginx
+        name: 
+          - nginx
         state: present
       when: (ansible_facts["hostname"] == "centralServer")
+
+    - name: install nginx
+      ansible.builtin.apt:
+        name: 
+          - nmap
+        state: present
+      when: (ansible_facts["hostname"] == "centralRouter")
 
     - name: disable ufw
       ansible.builtin.systemd_service:
@@ -66,7 +74,16 @@
         mode: 0644
       when: (ansible_hostname != "inetRouter") 
 
-    - name: add default gateway for centralRouter
+    - name: knock script
+      template: 
+        src: templates/knock.sh
+        dest: /home/vagrant/knock.sh
+        owner: vagrant
+        group: vagrant
+        mode: 0755
+      when: (ansible_hostname == "centralRouter") 
+
+    - name: add default gateway
       template: 
         src: templates/50-vagrant_{{ansible_hostname}}.yaml
         dest: /etc/netplan/50-vagrant.yaml
