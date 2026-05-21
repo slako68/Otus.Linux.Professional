@@ -1,0 +1,120 @@
+- name: VPN
+  hosts: all
+  become: yes
+  vars_files:
+    - defaults/main.yml
+  tasks:
+    - name: set up forward packages across routers
+      sysctl:
+        name: net.ipv4.conf.all.forwarding
+        value: '1'
+        state: present
+
+    - name: install tools
+      apt:
+        name:
+          - openvpn
+          - easy-rsa
+        state: present
+        update_cache: true
+
+    - name: Initialize PKI
+      command: /usr/share/easy-rsa/easyrsa init-pki
+      args:
+        chdir: /etc/openvpn
+
+    - name: Generate CA certificate
+      shell: echo 'yes' | /usr/share/easy-rsa/easyrsa build-ca nopass
+      args:
+        chdir: /etc/openvpn
+
+    - name: Generate server certificate and key
+      shell: echo 'rasvpn' | /usr/share/easy-rsa/easyrsa gen-req server nopass
+      args:
+        chdir: /etc/openvpn
+
+    - name: Sign server certificate
+      shell: echo 'yes' | /usr/share/easy-rsa/easyrsa sign-req server server
+      args:
+        chdir: /etc/openvpn
+
+    - name: Generate Diffie-Hellman parameters
+      command: /usr/share/easy-rsa/easyrsa gen-dh
+      args:
+        chdir: /etc/openvpn
+
+    - name: Generate CA certificate
+      command: openvpn --genkey secret ca.key
+      args:
+        chdir: /etc/openvpn
+
+    - name: Generate client certificate and key
+      shell: echo 'client' | /usr/share/easy-rsa/easyrsa gen-req client nopass
+      args:
+        chdir: /etc/openvpn
+
+    - name: Sign client certificate
+      shell: echo 'yes' | /usr/share/easy-rsa/easyrsa sign-req client client
+      args:
+        chdir: /etc/openvpn
+
+    - name: server.conf 
+      template:
+        src: server.conf
+        dest: /etc/openvpn/server.conf
+        mode: 0644
+
+    - name: iroute
+      shell: "echo 'iroute 10.10.10.0 255.255.255.0' > /etc/openvpn/client/client"
+
+    - name: openvpn@.service 
+      template:
+        src: openvpn@.service
+        dest: /etc/systemd/system/openvpn@.service
+        mode: 0644
+
+    - name: Restart services
+      ansible.builtin.systemd:
+        name: openvpn@server
+        state: started
+        enabled: yes
+        daemon_reload: true
+
+    - name: restart all hosts
+      reboot:
+        reboot_timeout: 600
+
+    - name: client.conf 
+      become: false
+      template:
+        src: client.conf
+        dest: ./
+      delegate_to: localhost
+
+    - name: Fetch file from server
+      fetch:
+        src: /etc/openvpn/pki/private/client.key
+        dest: ./
+        flat: yes
+      delegate_to: server
+
+    - name: Fetch file from server
+      fetch:
+        src: /etc/openvpn/pki/ca.crt 
+        dest: ./
+        flat: yes
+      delegate_to: server
+
+    - name: Fetch file from server
+      fetch:
+        src: /etc/openvpn/pki/issued/client.crt 
+        dest: ./
+        flat: yes
+      delegate_to: server
+
+    - name: mode 0600
+      file:
+        path: ./client.key
+        state: file
+        mode: '0600'
+      delegate_to: localhost

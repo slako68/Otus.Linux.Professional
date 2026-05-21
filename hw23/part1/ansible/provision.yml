@@ -1,0 +1,57 @@
+- name: VPN
+  hosts: all
+  become: yes
+  vars_files:
+    - defaults/main.yml
+  tasks:
+  - name: install tools
+    apt:
+      name:
+        - openvpn
+        - iperf3
+      state: present
+      update_cache: true
+
+  - name: Execute openvpn --genkey
+    ansible.builtin.command:
+      cmd: openvpn --genkey secret /etc/openvpn/static.key
+    args:
+      creates: /etc/openvpn/static.key 
+    when: ansible_hostname == "server"
+
+  - name: Fetch file from server
+    fetch:
+      src: /etc/openvpn/static.key
+      dest: /tmp/fetched_files/server/
+      flat: yes
+    delegate_to: server
+    when: ansible_hostname == "server"
+
+  - name: Copy fetched file to client
+    copy:
+      src: /tmp/fetched_files/server/static.key
+      dest: /etc/openvpn/static.key
+    when: ansible_hostname == "client"
+
+  - name: server.conf 
+    template:
+      src: server_{{ ansible_hostname }}.conf.j2
+      dest: /etc/openvpn/server.conf
+      owner: root
+      group: root
+      mode: 0640
+
+  - name: openvpn@.service 
+    template:
+      src: openvpn@.service
+      dest: /etc/systemd/system/openvpn@.service
+      owner: root
+      group: root
+      mode: 0640
+
+  - name: Restart services
+    ansible.builtin.systemd:
+      name: openvpn@server
+      state: started
+      enabled: yes
+      daemon_reload: true
