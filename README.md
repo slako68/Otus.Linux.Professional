@@ -24,3 +24,4 @@
 * [#22. Статическая и динамическая маршрутизация, OSPF.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw22)
 * [#23. Мосты, туннели и VPN.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw23)
 * [#24. DNS - настройка и обслуживание.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw24)
+* [#25. Сетевые пакеты. VLAN'ы. LACP.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw25)
