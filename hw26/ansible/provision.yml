@@ -1,0 +1,32 @@
+- name: setup FreeIPA-server
+  hosts: ipa.otus.lan
+  become: yes
+  tasks:
+    - name: install software
+      yum:
+        name:
+          - ipa-server
+        state: present
+        update_cache: true
+
+    - name: Set up timezone
+      timezone:
+        name: "Europe/Moscow"
+
+    - name: Copy hosts
+      copy:
+        src: templates/hosts
+        dest: /etc/hosts
+
+    - name: Open application ports
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      loop:
+        - 80/tcp
+        - 443/tcp
+        - 88/tcp
+        - 389/tcp
+        - 464/tcp

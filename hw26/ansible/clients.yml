@@ -1,0 +1,29 @@
+- name: setup FreeIPA clients
+  hosts: clients
+  become: yes
+  tasks:
+    #Установка временной зоны Европа/Москва    
+    - name: Set up timezone
+      timezone:
+        name: "Europe/Moscow"
+        
+    #Копирование файла /etc/hosts c правами root:root 0644
+    - name: change /etc/hosts
+      template:
+        src: hosts
+        dest: /etc/hosts
+        owner: root
+        group: root
+        mode: 0644
+    
+    #Установка клиента Freeipa
+    - name: install module ipa-client
+      yum:
+        name:
+          - freeipa-client
+        state: present
+        update_cache: true
+    
+    #Запуск скрипта добавления хоста к серверу
+    - name: add host to ipa-server
+      shell: echo -e "yes\nyes" | ipa-client-install --mkhomedir --domain=OTUS.LAN --server=ipa.otus.lan --no-ntp -p admin -w {{ pass }}
