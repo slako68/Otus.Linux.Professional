@@ -1,0 +1,39 @@
+- name: Base set up
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: install percona
+      ansible.builtin.shell: yum install -y https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+
+    - name: install percona
+      ansible.builtin.shell: percona-release enable-only ps-84-lts release
+
+    - name: install percona
+      ansible.builtin.shell: PERCONA_TELEMETRY_DISABLE=1 yum install -y percona-server-server
+
+    - name: Copy directory contents to remote host
+      ansible.builtin.copy:
+        src: conf/conf.d/
+        dest: /etc/my.cnf.d/
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Insert line after a specific pattern
+      ansible.builtin.lineinfile:
+        path: /etc/my.cnf
+        line: "!includedir /etc/my.cnf.d/"
+
+    - name: Permit traffic for 3306/tcp
+      ansible.posix.firewalld:
+        port: 3306/tcp
+        permanent: true
+        immediate: true
+        state: enabled
+
+    - name: Start and enable mysql
+      ansible.builtin.systemd:
+        name: mysql
+        state: started
+        enabled: yes
