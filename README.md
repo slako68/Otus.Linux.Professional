@@ -26,3 +26,4 @@
 * [#24. DNS - настройка и обслуживание.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw24)
 * [#25. Сетевые пакеты. VLAN'ы. LACP.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw25)
 * [#26. LDAP. Централизованная авторизация и аутентификация.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw26)
+* [#27. Динамический веб.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw27/project)
