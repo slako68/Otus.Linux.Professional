@@ -1,0 +1,16 @@
+---  
+  # Устанавливаем postgresql
+  - name: install postgresql-server
+    apt: 
+      name: 
+          - postgresql-{{ pg_ver }}
+          - postgresql-contrib-{{ pg_ver }}
+      state: present
+      update_cache: true
+  
+  # Запускаем postgresql
+  - name: enable and start service
+    service:
+      name: postgresql
+      state: started
+      enabled: true

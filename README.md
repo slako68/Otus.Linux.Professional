@@ -28,3 +28,4 @@
 * [#26. LDAP. Централизованная авторизация и аутентификация.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw26)
 * [#27. Динамический веб.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw27/project)
 * [#28. MySQL: Backup + Репликация.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw28)
+* [#29. Postgres: Backup + Репликация.](https://github.com/slako68/Otus.Linux.Professional/tree/main/hw29)
